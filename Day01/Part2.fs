@@ -21,28 +21,7 @@ let parseInstruction (str: string) =
     let amount = Array.tail chars |> System.String |> int
     operation, amount
 
-let calculateNewLocation (startPosition: int) (instruction: Instruction) : int =
-    match instruction with
-    | Add, amount -> (startPosition + amount) % 100
-    | Subtract, amount ->
-        let result = (startPosition - amount) % 100
-        if result < 0 then result + 100 else result
 
-
-let calculateZeroes (startPosition: int) (instruction: Instruction) =
-    let operation, amount = instruction
-
-    match operation with
-    | Add ->
-        let completeLoops = amount / 100
-        let remainder = amount % 100
-        let crossedZero = if startPosition + remainder >= 100 then 1 else 0
-        completeLoops + crossedZero
-    | Subtract ->
-        let completeLoops = amount / 100
-        let remainder = amount % 100
-        let crossedZero = if remainder > startPosition then 1 else 0
-        completeLoops + crossedZero
 
 let calcZeroesMut startPosition instruction =
     let mutable position = startPosition
@@ -63,7 +42,7 @@ let calcZeroesMut startPosition instruction =
 
             position <- newPosition
 
-        count
+        position, count
     | Subtract ->
         for _ = 1 to turns do
             let newPosition =
@@ -76,13 +55,38 @@ let calcZeroesMut startPosition instruction =
 
             position <- newPosition
 
-        count
+        position, count
+
+
+let calcZeroes startPosition instruction =
+    let operation, turns = instruction
+
+    let step =
+        match operation with
+        | Add -> fun pos -> if pos = 99 then 0 else pos + 1
+        | Subtract -> fun pos -> if pos = 0 then 99 else pos - 1
+
+    // Builds a sequence based on the number of turns and startPosition. The internal will be the position
+    let positions =
+        startPosition
+        // Infinitely steps through according to the step function
+        |> Seq.unfold (fun pos ->
+            let next = step pos
+            Some(next, next))
+        // Because Seq is lazy, the .take here determines the max number of iterations
+        |> Seq.take turns
+
+    // The end position is the last item in a sequence
+    let endPosition = positions |> Seq.last
+    // Filter to only zeroes and count
+    let zeroCount = positions |> Seq.filter ((=) 0) |> Seq.length
+
+    endPosition, zeroCount
 
 let calculateResult startPosition line =
     let instruction = parseInstruction line
-    let newLocation = calculateNewLocation startPosition instruction
-    let count = calcZeroesMut startPosition instruction
-    count, newLocation
+    let position, count = calcZeroes startPosition instruction
+    count, position
 
 
 let run () =
