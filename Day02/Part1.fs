@@ -1,12 +1,13 @@
 module Day02.Part1
 
 open System.IO
+open System.Numerics
 
 type EvenOrOdd =
     | Even
     | Odd
 
-let getNumberOfDigits num : int = num.ToString().Length
+let getNumberOfDigits (num: bigint) : int = num.ToString().Length
 
 let getEvenOrOdd (numberOfDigits: int) : EvenOrOdd =
     if numberOfDigits % 2 = 0 then Even else Odd
@@ -20,8 +21,8 @@ let run () =
         split
         |> Array.map (fun x ->
             let splitOnDash = x.Split("-")
-            let startOfSequence = int splitOnDash.[0]
-            let endOfSequence = int splitOnDash.[1]
+            let startOfSequence = bigint.Parse splitOnDash.[0]
+            let endOfSequence = bigint.Parse splitOnDash.[1]
             let fullSequence = [| startOfSequence..endOfSequence |] |> Seq.ofArray
 
             let filteredDoubles =
