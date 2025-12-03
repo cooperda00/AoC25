@@ -2,22 +2,12 @@ module Day03.Part2
 
 open System.IO
 
-// let findLargestWithinRange (startIndex: int) (endIndex: int) (arr: char array) =
-//     arr[startIndex..endIndex]
-//     |> Array.indexed
-//     |> Array.maxBy snd // characters are compared by unicode so '9' > '8'. Returns first occurence if multiple
-//     |> fun (windowIndex, digit) -> digit, startIndex + windowIndex + 1
-
 let findLargestWithinRange (startIndex: int) (endIndex: int) (arr: char array) =
-    let mutable maxDigit = '0'
-    let mutable maxPos = startIndex
+    arr[startIndex..endIndex]
+    |> Array.indexed
+    |> Array.maxBy snd // characters are compared by unicode so '9' > '8'. Returns first occurence if multiple
+    |> fun (windowIndex, digit) -> digit, startIndex + windowIndex + 1
 
-    for i in startIndex..endIndex do
-        if arr[i] > maxDigit then
-            maxDigit <- arr[i]
-            maxPos <- i
-
-    maxDigit, maxPos + 1
 
 let calculateNumberFromLine (input: char array) =
     let finalIndex = input.Length - 1
