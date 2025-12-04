@@ -88,10 +88,10 @@ let run () =
     let lines = File.ReadAllLines "./Day04/input.txt"
     let lookup = createLookup lines
     let totalLines = lines.Length
+    let indexdLines = lines |> Array.indexed
 
     let res =
-        lines
-        |> Array.indexed
+        indexdLines
         |> Array.map (fun (rowIndex, line) -> parseLine line rowIndex totalLines lookup)
         |> Array.sum
 
