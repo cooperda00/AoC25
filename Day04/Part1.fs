@@ -57,9 +57,10 @@ let parseLine (line: string) (rowIndex: int) (totalLines: int) (lookup: Map<stri
                     | None -> '.'
                     | Some char -> char)
 
-            let numberOfRolls = contents |> List.filter positionHasScroll |> List.length
+            let numberOfSurroundingRolls =
+                contents |> List.filter positionHasScroll |> List.length
 
-            let result = if numberOfRolls < 4 then 1 else 0
+            let result = if numberOfSurroundingRolls < 4 then 1 else 0
 
             result
 
