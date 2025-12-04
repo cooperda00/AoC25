@@ -9,6 +9,8 @@ let main argv =
     | [| "2:2" |] -> Day02.Part2.run ()
     | [| "3:1" |] -> Day03.Part1.run ()
     | [| "3:2" |] -> Day03.Part2.run ()
+    | [| "4:1" |] -> Day04.Part1.run ()
+    | [| "4:2" |] -> Day04.Part2.run ()
     | [| day |] -> printfn "Unknown day: %s" day
     | _ -> printfn "Usage: dotnet run <day:part>"
 
