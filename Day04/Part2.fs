@@ -2,7 +2,7 @@ module Day04.Part2
 
 open System.IO
 
-let positionHasScroll char =
+let positionHasRoll char =
     match char with
     | char when char = '@' -> true
     | _ -> false
@@ -61,16 +61,16 @@ let parseLine
                         keysToCheck
                         |> List.filter (fun lookupKey ->
                             match currentMap.TryFind lookupKey with
-                            | Some char when positionHasScroll char -> true
+                            | Some char when positionHasRoll char -> true
                             | _ -> false)
                         |> List.length
 
                     if numberOfSurroundingRolls < 4 then
-                        (Map.add key 'x' currentMap, count + 1)
+                        Map.add key 'x' currentMap, count + 1
                     else
-                        (currentMap, count)
-                | _ -> (currentMap, count)
-            | _ -> (currentMap, count))
+                        currentMap, count
+                | _ -> currentMap, count
+            | _ -> currentMap, count)
         (lookup, 0)
 
 let doOnePass (lookup: Map<string, char>) (lines: string array) =
@@ -81,12 +81,12 @@ let doOnePass (lookup: Map<string, char>) (lines: string array) =
     |> Array.fold
         (fun (currentMap, totalCount) (rowIndex, line) ->
             let totalColumns = line.Length
-            let (newMap, lineCount) = parseLine line rowIndex totalLines totalColumns currentMap
-            (newMap, totalCount + lineCount))
+            let newMap, lineCount = parseLine line rowIndex totalLines totalColumns currentMap
+            newMap, totalCount + lineCount)
         (lookup, 0)
 
 let rec removeUntilStable lookup lines totalRemoved =
-    let (newMap, removedThisPass) = doOnePass lookup lines
+    let newMap, removedThisPass = doOnePass lookup lines
 
     if removedThisPass = 0 then
         totalRemoved
@@ -108,10 +108,11 @@ let createLookup lines =
         Map.empty
 
 let run () =
+    let stopWatch = System.Diagnostics.Stopwatch.StartNew()
     let lines = File.ReadAllLines "./Day04/input.txt"
     let lookup = createLookup lines
-
     let result = removeUntilStable lookup lines 0
-
-    printfn "Day 4:1 Solution"
+    stopWatch.Stop() // 600ms
+    printfn "Day 4:2 Solution"
+    printfn "%f" stopWatch.Elapsed.TotalMilliseconds
     printfn "%A" result
