@@ -2,13 +2,12 @@ module Day05.Part2
 
 open System.IO
 
+type Range = { Start: int64; End: int64 }
+
 let getRanges lines =
     let indexToSplit = lines |> Array.findIndex (fun line -> line = "")
-    let split = lines |> Array.splitAt indexToSplit
-    let ranges, _ = split
-    ranges
+    lines |> Array.splitAt indexToSplit |> fst
 
-type Range = { Start: int64; End: int64 }
 
 let parseRange (range: string) : Range =
     let parts = range.Split "-"
@@ -19,7 +18,7 @@ let parseRange (range: string) : Range =
 let convertRangesIntoStartAndEndRecord (ranges: string array) = ranges |> Array.map parseRange
 
 let mergeRanges (ranges: Range array) =
-    let sorted = ranges |> Array.sortBy (fun range -> range.Start, range.End)
+    let sorted = ranges |> Array.sortBy (fun range -> range.Start)
 
     (Array.empty, sorted)
     ||> Array.fold (fun out range ->
@@ -27,12 +26,12 @@ let mergeRanges (ranges: Range array) =
             [| range |]
         else
             let previousRange = out |> Array.last
-            let canMerge = range.Start <= previousRange.End
+            let canMerge = range.Start <= previousRange.End + int64 1 // +1 so we Merge toucing [10 - 20][21 - 30] = [10 - 30]
 
             if canMerge then
                 let newRange =
                     { Start = previousRange.Start
-                      End = range.End }
+                      End = max previousRange.End range.End }
 
                 out |> Array.updateAt (out.Length - 1) newRange
             else
@@ -42,7 +41,7 @@ let mergeRanges (ranges: Range array) =
 
 let sumDifferences (ranges: Range array) =
     ranges
-    |> Array.map (fun range -> range.End - range.Start + int64 1)
+    |> Array.map (fun range -> range.End - range.Start + int64 1) // +1 so that we are inclusive of start eg [10, 20] = 11
     |> Array.sum
 
 
